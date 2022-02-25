@@ -5,12 +5,12 @@
 import os
 import pandas as pd
 
-
 # declare path to saved data
 data_path = os.getcwd() + "\Data\Raw_Data\cleaned_merged_seasons.csv"
 
 # Read player data into pandas dataframe
 df = pd.read_csv(data_path).iloc[:, 1:]
+
 
 def assign_latest_team(dataframe, date_field, player_field, team_field):
     """
@@ -19,25 +19,39 @@ def assign_latest_team(dataframe, date_field, player_field, team_field):
     :param date_field: name of the datetime column in dataframe
     :param player_field: name of the player name column in dataframe
     :param team_field: name of the player team field in the dataframe
-    :return:
+    :return: dataframe with new team field and prior team field dropped
     """
     # Sort values by match date
     dataframe.sort_values(by=[date_field], ascending=False, inplace=True)
 
-    # Create dataset of only name instance
-    player_team = dataframe.drop_duplicates(subset=[player_field])[[player_field, team_field]]
-    player_team.reset_index(inplace=True, drop=True)
+    # Create dataset containing players names and their mose recent teams contained in the dataframe
+    # Rename the team_x column and reset the index for the player_team dataset
+    player_team = dataframe.drop_duplicates(subset=[player_field])[[player_field, team_field]]\
+        .rename(columns={'team_x': 'team'}).reset_index(inplace=True, drop=True)
+
+    # Drop previous team_field from the main dataframe
+    dataframe.drop(team_field, axis=1, inplace=True)
 
     # Merge player_team dataset with main dataframe
     dataframe = pd.merge(dataframe, player_team, how='left', on=['name']).rename(columns={'team_x_y': 'team'})
 
-    # Drop previous team_field
-    dataframe.drop(team_field + "_x", axis=1, inplace=True)
-
+    # Return the modified dataframe
     return dataframe
 
+
 def data_transformations(dataframe):
-    # Convert kickoff_time field to datetime object
-    df['match_date'] = pd.to_datetime(
-        df['kickoff_time'].apply(lambda x: x[:-10]) + " " + df['kickoff_time'].apply(lambda x: x[-9:-1]))
-    df.drop('kickoff_time', inplace=True, axis=1)
+    # Convert kickoff_time field to datetime object and drop the previous match_date field
+    dataframe['match_date'] = pd.to_datetime(dataframe['kickoff_time'].apply(lambda x: x[:-10]) + " " +
+                                             dataframe['kickoff_time'].apply(lambda x: x[-9:-1]))\
+        .drop('kickoff_time', inplace=True, axis=1)
+
+    #  Assign players their latest team using the assign_latest_team function
+    dataframe = assign_latest_team(dataframe, 'match_date', 'name', 'team_x')
+
+    #
+
+    # Return the transformed dataset
+    return dataframe
+
+
+data_transformations(df)
