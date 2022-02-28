@@ -51,7 +51,7 @@ def data_transformations(dataframe):
     #  Assign players their latest team using the assign_latest_team function
     dataframe = assign_latest_team(dataframe, 'match_date', 'name', 'team_x')
 
-    #
+    # Dealing with missing home and away scores
 
     # Return the transformed dataset
     return dataframe
