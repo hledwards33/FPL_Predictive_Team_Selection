@@ -82,7 +82,7 @@ def data_transformations(dataframe, date_field, player_field, team_field, input_
     dataframe = team_rating_system(dataframe, input_data_path, team_rating_data, 'home')
 
     # Some home teams do not have team ranking due to us using most recent team in dataset
-    fill_null_team_rating(dataframe, input_data_path, team_rating_data)
+    dataframe = fill_null_team_rating(dataframe, input_data_path, team_rating_data)
 
     # Return the transformed dataset
     return dataframe
@@ -215,15 +215,12 @@ def fill_null_team_rating(dataframe, input_data_path, team_rating_data):
 
     # Merge columns team_latest_ratings and team_ratings where team_ratings is nan
     dataframe['merged_col'] = dataframe['team_rating'].where(dataframe['team_rating'].notnull(),
-                                                             dataframe['team_latest_rating']).astype(int)
+                                                             dataframe['team_latest_rating'])
 
-    # Drop non-merged team ratings columns
+    # Drop non-merged (old) team ratings columns
     dataframe.drop(['team_rating', 'team_latest_rating'], axis=1, inplace=True)
 
     # Rename merge team rating columns
     dataframe.rename(columns={'merged_col': 'team_rating'}, inplace=True)
 
     return dataframe
-
-
-
