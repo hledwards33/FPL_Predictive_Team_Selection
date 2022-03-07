@@ -82,7 +82,6 @@ def data_transformations(dataframe, date_field, player_field, team_field, input_
     # Remove player data points where the player has not played any minutes
     dataframe = dataframe[dataframe['minutes'] != 0]
 
-    # TODO: add in team rating system to the dataset
     # Apply team rating system to the dataset
     dataframe = team_rating_system(dataframe, input_data_path, team_rating_data, 'opponent')
     dataframe = team_rating_system(dataframe, input_data_path, team_rating_data, 'home')
@@ -163,12 +162,16 @@ def team_rating_system(dataframe, input_data_path, team_rating_data, home_or_opp
     # Drop Position column from team_ratings
     team_ratings.drop('Position', axis=1, inplace=True)
 
+    # Rename column name for mapping/merge
+    team_ratings.rename(columns={'Team': team_col_name}, inplace=True)
+
     # Merge the input dataframe with team_ratings on Season and team_col_name
     dataframe = pd.merge(dataframe, team_ratings, how='left', on=['Season', team_col_name])
 
     if home_or_opp_team != 'home':
         dataframe.drop([team_col_name, 'opponent_team'], axis=1, inplace=True)
 
+    # Return dataset with team ratings
     return dataframe
 
 
