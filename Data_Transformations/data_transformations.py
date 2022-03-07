@@ -3,18 +3,14 @@
 
 # Import modules
 import pandas as pd
+import os
 
 
-def dataset_creation(input_data_path, ):
+def dataset_creation(input_data_path, input_data, output_data_path, date_field, player_field, team_field):
     # Declare path to saved data and outputted data
-    input_data_path = os.path.join(os.getcwd(), "Data", "Raw_Data")
-    output_data_path = os.path.join(os.getcwd(), "Data", "Transformed_Data")
 
     # Read player data into pandas dataframe
-    dataframe = pd.read_csv(os.path.join(input_data_path, "cleaned_merged_seasons.csv"), low_memory=False).iloc[:, 1:]
-    date_field = 'match_date'
-    player_field = 'name'
-    team_field = 'team_x'
+    dataframe = pd.read_csv(os.path.join(input_data_path, input_data), low_memory=False).iloc[:, 1:]
 
     # Create cleaned and transformed dataset for for use in model
     dataframe = data_transformations(dataframe, date_field, player_field, team_field)
@@ -49,6 +45,28 @@ def dataset_creation(input_data_path, ):
     attackers_correlated.to_csv(os.path.join(output_data_path, 'attackers_correlated.csv'), index=False)
 
 
+def data_transformations(dataframe, date_field, player_field, team_field):
+    # Convert kickoff_time field to datetime object
+    dataframe['match_date'] = pd.to_datetime(
+        dataframe['kickoff_time'].apply(lambda x: x[:-10]) + " " + dataframe['kickoff_time'].apply(lambda x: x[-9:-1]))
+    #  Drop the previous match_date field
+    dataframe.drop('kickoff_time', inplace=True, axis=1)
+
+    #  Assign players their latest team using the assign_latest_team function
+    dataframe = assign_latest_team(dataframe, date_field, player_field, team_field)
+
+    # Dealing with missing home and away scores - drop rows that contain null data
+    dataframe.dropna(axis=0, inplace=True)
+
+    # Remove player data points where the player has not played any minutes
+    dataframe = dataframe[dataframe['minutes'] != 0]
+
+    # TODO: add in team rating system to the dataset
+
+    # Return the transformed dataset
+    return dataframe
+
+
 def assign_latest_team(dataframe, date_field, player_field, team_field):
     """
     This function assigns players a new team based on the latest team we have data for. i.e. we ignore transfers.
@@ -77,7 +95,14 @@ def assign_latest_team(dataframe, date_field, player_field, team_field):
 
 
 def position_datasets(dataframe, position1, position2=None):
-
+    """
+    This function filters the input dataframe to only include player of the chosen positions and outputs the resulting
+    dataframe
+    :param dataframe: full player dataset
+    :param position1: first chosen position to be included in output dataframe
+    :param position2: second chosen position to be included in output dataframe - optional argument
+    :return:
+    """
     # Create a dataset from the main based on desired positions
     if position2 is None:
         position_dataset = dataframe[dataframe['position'] == position1]
@@ -88,24 +113,11 @@ def position_datasets(dataframe, position1, position2=None):
     return position_dataset
 
 
-def data_transformations(dataframe, date_field, player_field, team_field):
-    # Convert kickoff_time field to datetime object
-    dataframe['match_date'] = pd.to_datetime(
-        dataframe['kickoff_time'].apply(lambda x: x[:-10]) + " " + dataframe['kickoff_time'].apply(lambda x: x[-9:-1]))
-    #  Drop the previous match_date field
-    dataframe.drop('kickoff_time', inplace=True, axis=1)
+input_data_path = os.path.join(os.getcwd(), "Data", "Raw_Data")
+input_data = "cleaned_merged_seasons.csv"
+output_data_path = os.path.join(os.getcwd(), "Data", "Transformed_Data")
+date_field = 'match_date'
+player_field = 'name'
+team_field = 'team_x'
 
-    #  Assign players their latest team using the assign_latest_team function
-    dataframe = assign_latest_team(dataframe, date_field, player_field, team_field)
-
-    # Dealing with missing home and away scores - drop rows that contain null data
-    dataframe.dropna(axis=0, inplace=True)
-
-    # Remove player data points where the player has not played any minutes
-    dataframe = dataframe[dataframe['minutes'] != 0]
-
-    # TODO: add in team rating system to the dataset
-
-    # Return the transformed dataset
-    return dataframe
-
+dataset_creation(input_data_path, input_data, output_data_path, date_field, player_field, team_field)
