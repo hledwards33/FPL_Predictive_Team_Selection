@@ -62,7 +62,7 @@ def data_transformations(dataframe, date_field, player_field, team_field):
     :param date_field: date field name within the full player dataset
     :param player_field: player name field within the full player dataset
     :param team_field: team name field within the full player dataset
-    :return: returns
+    :return: dataframe with with transformed data fields ready to be inputted into model for training
     """
     # Convert kickoff_time field to datetime object
     dataframe['match_date'] = pd.to_datetime(
