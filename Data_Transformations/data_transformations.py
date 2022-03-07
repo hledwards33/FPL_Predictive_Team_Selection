@@ -211,7 +211,10 @@ def fill_null_team_rating(dataframe, input_data_path, team_rating_data):
     team_ratings.rename(columns={'Team': 'team'}, inplace=True)
 
     # Merge team_latest_ratings column to input dataframe
-    dataframe = pd.merge(dataframe, team_latest_ratings, how='left', on=['Season', 'team'])
+    dataframe = pd.merge(dataframe, team_latest_ratings, how='left', on=['team'])
+
+    # Merge columns team_latest_ratings and team_ratings
+    dataframes = dataframe
 
 
 
