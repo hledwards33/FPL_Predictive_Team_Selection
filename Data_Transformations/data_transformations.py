@@ -16,7 +16,7 @@ def dataset_creation(input_data_path, input_data, output_data_path, date_field, 
     dataframe = data_transformations(dataframe, date_field, player_field, team_field)
 
     # Rename a select few variables
-    dataframe.rename(columns={'season_x': 'Season', 'team_x': 'team'})
+    dataframe.rename(columns={'season_x': 'Season', 'team_x': 'team'}, inplace=True)
 
     # Create datasets filtered by player's position
     goalkeepers = position_datasets(dataframe, 'GK')
