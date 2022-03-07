@@ -32,6 +32,14 @@ def assign_latest_team(dataframe, date_field, player_field, team_field):
     return dataframe
 
 
+def position_datasets(dataframe, position1, position2):
+
+    # Create a dataset from the main based on desired positions
+    position_dataset = dataframe
+
+    return position_dataset
+
+
 def data_transformations(dataframe, date_field, player_field, team_field):
     # Convert kickoff_time field to datetime object
     dataframe['match_date'] = pd.to_datetime(
@@ -44,6 +52,9 @@ def data_transformations(dataframe, date_field, player_field, team_field):
 
     # Dealing with missing home and away scores - drop rows that contain null data
     dataframe.dropna(axis=0, inplace=True)
+
+    # Remove player data points where the player has not played any minutes
+    dataframe = dataframe[dataframe['minutes'] != 0]
 
     # Return the transformed dataset
     return dataframe

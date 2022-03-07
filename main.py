@@ -17,8 +17,6 @@ def main():
 
     df = data_transformations(dataframe, date_field, player_field, team_field)
 
-    print(len(df.index))
-
     return df
 
 
