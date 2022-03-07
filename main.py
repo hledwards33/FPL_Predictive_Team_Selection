@@ -4,11 +4,15 @@ import os
 from Data_Transformations.data_transformations import dataset_creation
 
 
-
-
-
 def main():
-    dataset_creation()
+    input_data_path = os.path.join(os.getcwd(), "Data", "Raw_Data")
+    input_data = "cleaned_merged_seasons.csv"
+    output_data_path = os.path.join(os.getcwd(), "Data", "Transformed_Data")
+    date_field = 'match_date'
+    player_field = 'name'
+    team_field = 'team_x'
+
+    dataset_creation(input_data_path, input_data, output_data_path, date_field, player_field, team_field)
 
 
 if __name__ == "__main__":

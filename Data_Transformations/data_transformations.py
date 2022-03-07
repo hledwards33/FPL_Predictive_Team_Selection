@@ -15,6 +15,9 @@ def dataset_creation(input_data_path, input_data, output_data_path, date_field, 
     # Create cleaned and transformed dataset for for use in model
     dataframe = data_transformations(dataframe, date_field, player_field, team_field)
 
+    # Rename a select few variables
+    dataframe.rename(columns={'season_x': 'Season', 'team_x': 'team'})
+
     # Create datasets filtered by player's position
     goalkeepers = position_datasets(dataframe, 'GK')
     defenders = position_datasets(dataframe, 'DEF')
@@ -32,9 +35,9 @@ def dataset_creation(input_data_path, input_data, output_data_path, date_field, 
                            'selected']
 
     # Create datasets only containing correlated values
-    goalkeepers_correlated = goalkeepers[goalkeepers_corr_vars]
-    defenders_correlated = defenders[defenders_corr_vars]
-    attackers_correlated = attackers[attackers_corr_vars]
+    goalkeepers_correlated = goalkeepers.reindex(columns=goalkeepers_corr_vars)
+    defenders_correlated = defenders.reindex(columns=defenders_corr_vars)
+    attackers_correlated = attackers.reindex(columns=attackers_corr_vars)
 
     # Save datasets that have been created
     goalkeepers.to_csv(os.path.join(output_data_path, 'goalkeepers.csv'), index=False)
@@ -107,17 +110,7 @@ def position_datasets(dataframe, position1, position2=None):
     if position2 is None:
         position_dataset = dataframe[dataframe['position'] == position1]
     else:
-        position_dataset = dataframe[dataframe['position'] == position1 | dataframe['position'] == position2]
+        position_dataset = dataframe[(dataframe['position'] == position1) | (dataframe['position'] == position2)]
 
     # Return the filtered datasets
     return position_dataset
-
-
-input_data_path = os.path.join(os.getcwd(), "Data", "Raw_Data")
-input_data = "cleaned_merged_seasons.csv"
-output_data_path = os.path.join(os.getcwd(), "Data", "Transformed_Data")
-date_field = 'match_date'
-player_field = 'name'
-team_field = 'team_x'
-
-dataset_creation(input_data_path, input_data, output_data_path, date_field, player_field, team_field)
