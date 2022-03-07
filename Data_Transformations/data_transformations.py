@@ -2,14 +2,7 @@
 # The output of this code should serve as the input to the predictive models.
 
 # Import modules
-import os
 import pandas as pd
-
-# declare path to saved data
-data_path = os.path.join(os.path.dirname(os.getcwd()), "Data", "Raw_Data", "cleaned_merged_seasons.csv")
-
-# Read player data into pandas dataframe
-df = pd.read_csv(data_path, low_memory=False).iloc[:, 1:]
 
 
 def assign_latest_team(dataframe, date_field, player_field, team_field):
@@ -39,7 +32,7 @@ def assign_latest_team(dataframe, date_field, player_field, team_field):
     return dataframe
 
 
-def data_transformations(dataframe):
+def data_transformations(dataframe, date_field, player_field, team_field):
     # Convert kickoff_time field to datetime object
     dataframe['match_date'] = pd.to_datetime(
         dataframe['kickoff_time'].apply(lambda x: x[:-10]) + " " + dataframe['kickoff_time'].apply(lambda x: x[-9:-1]))
@@ -47,17 +40,10 @@ def data_transformations(dataframe):
     dataframe.drop('kickoff_time', inplace=True, axis=1)
 
     #  Assign players their latest team using the assign_latest_team function
-    dataframe = assign_latest_team(dataframe, 'match_date', 'name', 'team_x')
+    dataframe = assign_latest_team(dataframe, date_field, player_field, team_field)
 
     # Dealing with missing home and away scores - drop rows that contain null data
     dataframe.dropna(axis=0, inplace=True)
 
     # Return the transformed dataset
     return dataframe
-
-dataframe = df
-date_field = 'match_date'
-player_field = 'name'
-team_field = 'team_x'
-
-data_transformations(df)
