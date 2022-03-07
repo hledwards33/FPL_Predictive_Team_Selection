@@ -132,7 +132,29 @@ def position_datasets(dataframe, position1, position2=None):
     # Return the filtered datasets
     return position_dataset
 
-def team_rating_system(dataframe, input_data_path, team_rating_data):
+def team_rating_system(dataframe, input_data_path, team_rating_data, ranking_col_name):
 
     # Read in the team ratings data
-    team_ratings = pd.read_csv()
+    team_ratings = pd.read_csv(os.path.join(input_data_path, team_rating_data))
+
+    # Apply quartile scoring to the team's rankings
+    team_ratings[ranking_col_name] = team_ratings['Position'].apply(lambda x: quartile_scoring(x))
+
+
+
+def quartile_scoring(rank):
+    """
+    This function gives a score between 1 - 4 based on a teams ranks between 1 - 20.
+    Scoring logic is score = ceiling(rank/5)
+    :param rank: team's rank in a given season
+    :return: score between 1 - 4 based on the team's rank
+    """
+    # Create scoring system based on rank
+    if rank <= 5:
+        return 1
+    elif rank <= 10:
+        return 2
+    elif rank <= 15:
+        return 3
+    else:
+        return 4
