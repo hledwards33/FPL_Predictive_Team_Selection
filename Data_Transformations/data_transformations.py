@@ -14,10 +14,7 @@ def dataset_creation(input_data_path, input_data, team_rating_data, output_data_
     dataframe = pd.read_csv(os.path.join(input_data_path, input_data), low_memory=False).iloc[:, 1:]
 
     # Create cleaned and transformed dataset for for use in model
-    dataframe = data_transformations(dataframe, date_field, player_field, team_field)
-
-    # Rename a select few variables
-    dataframe.rename(columns={'season_x': 'Season', 'team_x': 'team'}, inplace=True)
+    dataframe = data_transformations(dataframe, date_field, player_field, team_field, input_data_path, team_rating_data)
 
     # Create datasets filtered by player's position
     goalkeepers = position_datasets(dataframe, 'GK')
@@ -56,13 +53,15 @@ def dataset_creation(input_data_path, input_data, team_rating_data, output_data_
     attackers_correlated.to_csv(os.path.join(output_data_path, 'attackers_correlated.csv'), index=False)
 
 
-def data_transformations(dataframe, date_field, player_field, team_field, input_data_path, team_ratings):
+def data_transformations(dataframe, date_field, player_field, team_field, input_data_path, team_rating_data):
     """
     This function takes care of the data transformations to make the data usable in the predictive model
     :param dataframe: full player dataset
     :param date_field: date field name within the full player dataset
     :param player_field: player name field within the full player dataset
     :param team_field: team name field within the full player dataset
+    :param input_data_path: file path to the input datasets
+    :param team_rating_data: file name of the past premier league table data
     :return: dataframe with with transformed data fields ready to be inputted into model for training
     """
     # Convert kickoff_time field to datetime object
@@ -74,6 +73,9 @@ def data_transformations(dataframe, date_field, player_field, team_field, input_
     #  Assign players their latest team using the assign_latest_team function
     dataframe = assign_latest_team(dataframe, date_field, player_field, team_field)
 
+    # Rename a select few variables
+    dataframe.rename(columns={'season_x': 'Season', 'team_x': 'team'}, inplace=True)
+
     # Dealing with missing home and away scores - drop rows that contain null data
     dataframe.dropna(axis=0, inplace=True)
 
@@ -82,7 +84,8 @@ def data_transformations(dataframe, date_field, player_field, team_field, input_
 
     # TODO: add in team rating system to the dataset
     # Apply team rating system to the dataset
-    dataframe = team_rating_system(dataframe, input_data_path, team_ratings)
+    dataframe = team_rating_system(dataframe, input_data_path, team_rating_data, 'opponent')
+    dataframe = team_rating_system(dataframe, input_data_path, team_rating_data, 'home')
 
     # Return the transformed dataset
     return dataframe
@@ -135,6 +138,14 @@ def position_datasets(dataframe, position1, position2=None):
 
 
 def team_rating_system(dataframe, input_data_path, team_rating_data, home_or_opp_team: str):
+    """
+
+    :param dataframe:
+    :param input_data_path:
+    :param team_rating_data:
+    :param home_or_opp_team:
+    :return:
+    """
     # Read in the team ratings data
     team_ratings = pd.read_csv(os.path.join(input_data_path, team_rating_data))
 
@@ -147,13 +158,18 @@ def team_rating_system(dataframe, input_data_path, team_rating_data, home_or_opp
         ranking_col_name = 'opp_team_rating'
 
     # Apply quartile scoring to the team's rankings
-    ranking_col_name = home_or_opp_team + '_rating'
     team_ratings[ranking_col_name] = team_ratings['Position'].apply(lambda x: quartile_scoring(x))
 
     # Drop Position column from team_ratings
     team_ratings.drop('Position', axis=1, inplace=True)
 
-    # Rename the team_ratings column names to match
+    # Merge the input dataframe with team_ratings on Season and team_col_name
+    dataframe = pd.merge(dataframe, team_ratings, how='left', on=['Season', team_col_name])
+
+    if home_or_opp_team != 'home':
+        dataframe.drop([team_col_name, 'opponent_team'], axis=1, inplace=True)
+
+    return dataframe
 
 
 def quartile_scoring(rank):
