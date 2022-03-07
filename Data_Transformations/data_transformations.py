@@ -32,10 +32,14 @@ def assign_latest_team(dataframe, date_field, player_field, team_field):
     return dataframe
 
 
-def position_datasets(dataframe, position1, position2):
+def position_datasets(dataframe, position1, position2=None):
 
     # Create a dataset from the main based on desired positions
-    position_dataset = dataframe
+    if position2 is None:
+        position_dataset = dataframe[dataframe['position'] == position1]
+    else:
+        position_dataset = dataframe[dataframe['position'] == position1 | dataframe['position'] == position2]
+
 
     return position_dataset
 
