@@ -196,4 +196,22 @@ def fill_null_team_rating(dataframe, input_data_path, team_rating_data):
     team_ratings = pd.read_csv(os.path.join(input_data_path, team_rating_data))
 
     # Sort team ratings by Season, latest to oldest
-    team_ratings.sort_values(by=['Season'], ascending=False, inplace=True)
+    team_ratings.sort_values(by=['Season', 'Position'], ascending=[False, True], inplace=True)
+
+    # Keep only the latest team position available
+    team_latest_ratings = team_ratings.drop_duplicates(subset=['Team'])[['Team', 'Position']]
+
+    # Apply quartile scoring to team_latest_ratings
+    team_latest_ratings['team_latest_ratings'] = team_latest_ratings['Position'].apply(lambda x: quartile_scoring(x))
+
+    # Drop Position column from team_latest_rating
+    team_latest_ratings.drop('Position', axis=1, inplace=True)
+
+    # Rename column name for mapping/merge
+    team_ratings.rename(columns={'Team': 'team'}, inplace=True)
+
+    # Merge team_latest_ratings column to input dataframe
+    dataframe = pd.merge(dataframe, team_latest_ratings, how='left', on=['Season', 'team'])
+
+
+
