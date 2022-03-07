@@ -6,7 +6,8 @@ import pandas as pd
 import os
 
 
-def dataset_creation(input_data_path, input_data, team_rating_data, output_data_path, date_field, player_field, team_field):
+def dataset_creation(input_data_path, input_data, team_rating_data, output_data_path, date_field, player_field,
+                     team_field):
     # Declare path to saved data and outputted data
 
     # Read player data into pandas dataframe
@@ -132,14 +133,27 @@ def position_datasets(dataframe, position1, position2=None):
     # Return the filtered datasets
     return position_dataset
 
-def team_rating_system(dataframe, input_data_path, team_rating_data, ranking_col_name):
 
+def team_rating_system(dataframe, input_data_path, team_rating_data, home_or_opp_team: str):
     # Read in the team ratings data
     team_ratings = pd.read_csv(os.path.join(input_data_path, team_rating_data))
 
+    # Define the team name column to apply mapping on and output ranking column names
+    if home_or_opp_team == 'home':
+        team_col_name = 'team'
+        ranking_col_name = 'team_rating'
+    else:
+        team_col_name = 'opp_team_name'
+        ranking_col_name = 'opp_team_rating'
+
     # Apply quartile scoring to the team's rankings
+    ranking_col_name = home_or_opp_team + '_rating'
     team_ratings[ranking_col_name] = team_ratings['Position'].apply(lambda x: quartile_scoring(x))
 
+    # Drop Position column from team_ratings
+    team_ratings.drop('Position', axis=1, inplace=True)
+
+    # Rename the team_ratings column names to match
 
 
 def quartile_scoring(rank):
