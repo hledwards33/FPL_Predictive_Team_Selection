@@ -26,8 +26,6 @@ def assign_latest_team(dataframe, date_field, player_field, team_field):
 
     # Create dataset containing players names and their mose recent teams contained in the dataframe
     player_team = dataframe.drop_duplicates(subset=[player_field])[[player_field, team_field]]
-    # Rename the team_x column to team
-    player_team.rename(columns={'team_x': 'team'})
     # Reset the index for the player_team dataset
     player_team.reset_index(inplace=True, drop=True)
 
@@ -35,7 +33,7 @@ def assign_latest_team(dataframe, date_field, player_field, team_field):
     dataframe.drop(team_field, axis=1, inplace=True)
 
     # Merge player_team dataset with main dataframe
-    dataframe = pd.merge(dataframe, player_team, how='left', on=['name'])#.rename(columns={'team_x_y': 'team'})
+    dataframe = pd.merge(dataframe, player_team, how='left', on=['name'])
 
     # Return the modified dataframe
     return dataframe
@@ -51,10 +49,15 @@ def data_transformations(dataframe):
     #  Assign players their latest team using the assign_latest_team function
     dataframe = assign_latest_team(dataframe, 'match_date', 'name', 'team_x')
 
-    # Dealing with missing home and away scores
+    # Dealing with missing home and away scores - drop rows that contain null data
+    dataframe.dropna(axis=0, inplace=True)
 
     # Return the transformed dataset
     return dataframe
 
+dataframe = df
+date_field = 'match_date'
+player_field = 'name'
+team_field = 'team_x'
 
 data_transformations(df)
