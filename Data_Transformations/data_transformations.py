@@ -81,6 +81,9 @@ def data_transformations(dataframe, date_field, player_field, team_field, input_
     dataframe = team_rating_system(dataframe, input_data_path, team_rating_data, 'opponent')
     dataframe = team_rating_system(dataframe, input_data_path, team_rating_data, 'home')
 
+    # Some home teams do not have team ranking due to us using most recent team in dataset
+    fill_null_team_rating(dataframe, input_data_path, team_rating_data)
+
     # Return the transformed dataset
     return dataframe
 
@@ -186,3 +189,11 @@ def quartile_scoring(rank):
         return 3
     else:
         return 4
+
+
+def fill_null_team_rating(dataframe, input_data_path, team_rating_data):
+    # Read in the ratings data
+    team_ratings = pd.read_csv(os.path.join(input_data_path, team_rating_data))
+
+    # Sort team ratings by Season, latest to oldest
+    team_ratings.sort_values(by=['Season'], ascending=False, inplace=True)
