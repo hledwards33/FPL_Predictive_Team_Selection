@@ -12,7 +12,7 @@ def main():
     player_field = 'name'
     team_field = 'team_x'
 
-    dataset_creation(input_data_path, input_data, output_data_path, date_field, player_field, team_field)
+    dataset_creation(input_data_path, input_data, output_data_path, date_field, player_field, team_field, )
 
 
 if __name__ == "__main__":

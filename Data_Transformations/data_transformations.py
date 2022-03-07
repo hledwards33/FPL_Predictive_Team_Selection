@@ -6,7 +6,7 @@ import pandas as pd
 import os
 
 
-def dataset_creation(input_data_path, input_data, output_data_path, date_field, player_field, team_field):
+def dataset_creation(input_data_path, input_data, team_rating_data, output_data_path, date_field, player_field, team_field):
     # Declare path to saved data and outputted data
 
     # Read player data into pandas dataframe
@@ -55,7 +55,7 @@ def dataset_creation(input_data_path, input_data, output_data_path, date_field, 
     attackers_correlated.to_csv(os.path.join(output_data_path, 'attackers_correlated.csv'), index=False)
 
 
-def data_transformations(dataframe, date_field, player_field, team_field):
+def data_transformations(dataframe, date_field, player_field, team_field, input_data_path, team_ratings):
     """
     This function takes care of the data transformations to make the data usable in the predictive model
     :param dataframe: full player dataset
@@ -80,6 +80,8 @@ def data_transformations(dataframe, date_field, player_field, team_field):
     dataframe = dataframe[dataframe['minutes'] != 0]
 
     # TODO: add in team rating system to the dataset
+    # Apply team rating system to the dataset
+    dataframe = team_rating_system(dataframe, input_data_path, team_ratings)
 
     # Return the transformed dataset
     return dataframe
@@ -129,3 +131,8 @@ def position_datasets(dataframe, position1, position2=None):
 
     # Return the filtered datasets
     return position_dataset
+
+def team_rating_system(dataframe, input_data_path, team_rating_data):
+
+    # Read in the team ratings data
+    team_ratings = pd.read_csv()
