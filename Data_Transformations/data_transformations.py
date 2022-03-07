@@ -40,7 +40,7 @@ def position_datasets(dataframe, position1, position2=None):
     else:
         position_dataset = dataframe[dataframe['position'] == position1 | dataframe['position'] == position2]
 
-
+    # Return the filtered datasets
     return position_dataset
 
 
