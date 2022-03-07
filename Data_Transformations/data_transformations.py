@@ -37,12 +37,7 @@ def dataset_creation(input_data_path, input_data, team_rating_data, output_data_
     defenders_correlated = defenders.reindex(columns=defenders_corr_vars)
     attackers_correlated = attackers.reindex(columns=attackers_corr_vars)
 
-    print('goalkeepers', len(goalkeepers))
-    print('defenders', len(defenders))
-    print('attackers', len(attackers))
-    print('goalkeepers_correlated', len(goalkeepers_correlated))
-    print('defenders_correlated', len(defenders_correlated))
-    print('attackers_correlated', len(attackers_correlated))
+    print(dataframe, dataframe.isna().sum())
 
     # Save datasets that have been created
     goalkeepers.to_csv(os.path.join(output_data_path, 'goalkeepers.csv'), index=False)
