@@ -39,6 +39,13 @@ def dataset_creation(input_data_path, input_data, output_data_path, date_field, 
     defenders_correlated = defenders.reindex(columns=defenders_corr_vars)
     attackers_correlated = attackers.reindex(columns=attackers_corr_vars)
 
+    print('goalkeepers', len(goalkeepers))
+    print('defenders', len(defenders))
+    print('attackers', len(attackers))
+    print('goalkeepers_correlated', len(goalkeepers_correlated))
+    print('defenders_correlated', len(defenders_correlated))
+    print('attackers_correlated', len(attackers_correlated))
+
     # Save datasets that have been created
     goalkeepers.to_csv(os.path.join(output_data_path, 'goalkeepers.csv'), index=False)
     defenders.to_csv(os.path.join(output_data_path, 'defenders.csv'), index=False)
@@ -49,6 +56,14 @@ def dataset_creation(input_data_path, input_data, output_data_path, date_field, 
 
 
 def data_transformations(dataframe, date_field, player_field, team_field):
+    """
+    This function takes care of the data transformations to make the data usable in the predictive model
+    :param dataframe: full player dataset
+    :param date_field: date field name within the full player dataset
+    :param player_field: player name field within the full player dataset
+    :param team_field: team name field within the full player dataset
+    :return: returns
+    """
     # Convert kickoff_time field to datetime object
     dataframe['match_date'] = pd.to_datetime(
         dataframe['kickoff_time'].apply(lambda x: x[:-10]) + " " + dataframe['kickoff_time'].apply(lambda x: x[-9:-1]))
@@ -104,7 +119,7 @@ def position_datasets(dataframe, position1, position2=None):
     :param dataframe: full player dataset
     :param position1: first chosen position to be included in output dataframe
     :param position2: second chosen position to be included in output dataframe - optional argument
-    :return:
+    :return: dataframe containing only rows of players in desired positions
     """
     # Create a dataset from the main based on desired positions
     if position2 is None:
