@@ -60,6 +60,8 @@ def data_transformations(dataframe, date_field, player_field, team_field):
     # Remove player data points where the player has not played any minutes
     dataframe = dataframe[dataframe['minutes'] != 0]
 
+    # TODO: add in team rating system to the dataset
+
     # Return the transformed dataset
     return dataframe
 

@@ -5,12 +5,13 @@ import os
 from Data_Transformations.data_transformations import data_transformations, position_datasets
 
 
-def main():
-    # declare path to saved data
-    data_path = os.path.join(os.getcwd(), "Data", "Raw_Data", "cleaned_merged_seasons.csv")
+def dataset_creation():
+    # Declare path to saved data and outputted data
+    input_data_path = os.path.join(os.getcwd(), "Data", "Raw_Data")
+    output_data_path = os.path.join(os.getcwd(), "Data", "Transformed_Data")
 
     # Read player data into pandas dataframe
-    dataframe = pd.read_csv(os.path.join(data_path,"cleaned_merged_seasons.csv"), low_memory=False).iloc[:, 1:]
+    dataframe = pd.read_csv(os.path.join(input_data_path, "cleaned_merged_seasons.csv"), low_memory=False).iloc[:, 1:]
     date_field = 'match_date'
     player_field = 'name'
     team_field = 'team_x'
@@ -34,12 +35,22 @@ def main():
                            'ict_index', 'bonus', 'threat', 'minutes', 'creativity', 'assists', 'value', 'clean_sheets',
                            'selected']
 
+    # Create datasets only containing correlated values
     goalkeepers_correlated = goalkeepers[goalkeepers_corr_vars]
     defenders_correlated = defenders[defenders_corr_vars]
     attackers_correlated = attackers[attackers_corr_vars]
 
     # Save datasets that have been created
+    goalkeepers.to_csv(os.path.join(output_data_path, 'goalkeepers.csv'), index=False)
+    defenders.to_csv(os.path.join(output_data_path, 'defenders.csv'), index=False)
+    attackers.to_csv(os.path.join(output_data_path, 'attackers.csv'), index=False)
+    goalkeepers_correlated.to_csv(os.path.join(output_data_path, 'goalkeepers_correlated.csv'), index=False)
+    defenders_correlated.to_csv(os.path.join(output_data_path, 'defenders_correlated.csv'), index=False)
+    attackers_correlated.to_csv(os.path.join(output_data_path, 'attackers_correlated.csv'), index=False)
 
+
+def main():
+    dataset_creation()
 
 
 if __name__ == "__main__":
