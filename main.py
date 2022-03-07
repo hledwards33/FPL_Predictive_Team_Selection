@@ -10,14 +10,14 @@ def main():
     data_path = os.path.join(os.getcwd(), "Data", "Raw_Data", "cleaned_merged_seasons.csv")
 
     # Read player data into pandas dataframe
-    df = pd.read_csv(data_path, low_memory=False).iloc[:, 1:]
-
-    dataframe = df
+    dataframe = pd.read_csv(data_path, low_memory=False).iloc[:, 1:]
     date_field = 'match_date'
     player_field = 'name'
     team_field = 'team_x'
 
-    df = data_transformations(df, date_field, player_field, team_field)
+    df = data_transformations(dataframe, date_field, player_field, team_field)
+
+    print(len(df.index))
 
     return df
 
