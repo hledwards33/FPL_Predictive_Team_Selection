@@ -87,7 +87,7 @@ def data_transformations(dataframe, date_field, player_field, team_field):
 
 def assign_latest_team(dataframe, date_field, player_field, team_field):
     """
-    This function assigns players a new team based on the latest team we have data for. i.e. we ignore transfers.
+    This function assigns players a new team based on the latest team for which we have data. i.e. we ignore transfers.
     :param dataframe: full player dataset
     :param date_field: name of the datetime column in dataframe
     :param player_field: name of the player name column in dataframe
