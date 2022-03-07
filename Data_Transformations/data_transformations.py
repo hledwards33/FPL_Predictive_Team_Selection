@@ -37,8 +37,6 @@ def dataset_creation(input_data_path, input_data, team_rating_data, output_data_
     defenders_correlated = defenders.reindex(columns=defenders_corr_vars)
     attackers_correlated = attackers.reindex(columns=attackers_corr_vars)
 
-    print(dataframe, dataframe.isna().sum())
-
     # Save datasets that have been created
     goalkeepers.to_csv(os.path.join(output_data_path, 'goalkeepers.csv'), index=False)
     defenders.to_csv(os.path.join(output_data_path, 'defenders.csv'), index=False)
@@ -136,12 +134,12 @@ def position_datasets(dataframe, position1, position2=None):
 
 def team_rating_system(dataframe, input_data_path, team_rating_data, home_or_opp_team: str):
     """
-
-    :param dataframe:
-    :param input_data_path:
-    :param team_rating_data:
-    :param home_or_opp_team:
-    :return:
+    This function applies the team quartile rating system to the input datasets
+    :param dataframe: full player dataset
+    :param input_data_path: file path to the input datasets
+    :param team_rating_data: team name field within the full player dataset
+    :param home_or_opp_team: home/opponent based on which teams are being scored
+    :return: dataframe containing quartile scores for opponent/home team
     """
     # Read in the team ratings data
     team_ratings = pd.read_csv(os.path.join(input_data_path, team_rating_data))
@@ -192,6 +190,13 @@ def quartile_scoring(rank):
 
 
 def fill_null_team_rating(dataframe, input_data_path, team_rating_data):
+    """
+    This function
+    :param dataframe:
+    :param input_data_path:
+    :param team_rating_data:
+    :return:
+    """
     # Read in the ratings data
     team_ratings = pd.read_csv(os.path.join(input_data_path, team_rating_data))
 
