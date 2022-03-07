@@ -202,19 +202,28 @@ def fill_null_team_rating(dataframe, input_data_path, team_rating_data):
     team_latest_ratings = team_ratings.drop_duplicates(subset=['Team'])[['Team', 'Position']]
 
     # Apply quartile scoring to team_latest_ratings
-    team_latest_ratings['team_latest_ratings'] = team_latest_ratings['Position'].apply(lambda x: quartile_scoring(x))
+    team_latest_ratings['team_latest_rating'] = team_latest_ratings['Position'].apply(lambda x: quartile_scoring(x))
 
     # Drop Position column from team_latest_rating
     team_latest_ratings.drop('Position', axis=1, inplace=True)
 
     # Rename column name for mapping/merge
-    team_ratings.rename(columns={'Team': 'team'}, inplace=True)
+    team_latest_ratings.rename(columns={'Team': 'team'}, inplace=True)
 
     # Merge team_latest_ratings column to input dataframe
     dataframe = pd.merge(dataframe, team_latest_ratings, how='left', on=['team'])
 
-    # Merge columns team_latest_ratings and team_ratings
-    dataframes = dataframe
+    # Merge columns team_latest_ratings and team_ratings where team_ratings is nan
+    dataframe['merged_col'] = dataframe['team_rating'].where(dataframe['team_rating'].notnull(),
+                                                             dataframe['team_latest_rating']).astype(int)
+
+    # Drop non-merged team ratings columns
+    dataframe.drop(['team_rating', 'team_latest_rating'], axis=1, inplace=True)
+
+    # Rename merge team rating columns
+    dataframe.rename(columns={'merged_col': 'team_rating'}, inplace=True)
+
+    return dataframe
 
 
 
