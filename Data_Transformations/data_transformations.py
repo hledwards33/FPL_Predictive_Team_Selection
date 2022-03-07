@@ -8,6 +8,17 @@ import os
 
 def dataset_creation(input_data_path, input_data, team_rating_data, output_data_path, date_field, player_field,
                      team_field):
+    """
+    This function creates separate datasets for each position based
+    :param input_data_path: file path to the input datasets
+    :param input_data: file name of full player dataset
+    :param team_rating_data: file name of the past premier league table data
+    :param output_data_path: file path to save final datasets to
+    :param date_field: date field name within the full player dataset
+    :param player_field: player name field within the full player dataset
+    :param team_field: team name field within the full player dataset
+    :return: there is nothing returned datasets are saved to the output_data_path
+    """
     # Declare path to saved data and outputted data
 
     # Read player data into pandas dataframe
@@ -137,7 +148,7 @@ def team_rating_system(dataframe, input_data_path, team_rating_data, home_or_opp
     This function applies the team quartile rating system to the input datasets
     :param dataframe: full player dataset
     :param input_data_path: file path to the input datasets
-    :param team_rating_data: team name field within the full player dataset
+    :param team_rating_data: file name of the past premier league table data
     :param home_or_opp_team: home/opponent based on which teams are being scored
     :return: dataframe containing quartile scores for opponent/home team
     """
@@ -191,11 +202,11 @@ def quartile_scoring(rank):
 
 def fill_null_team_rating(dataframe, input_data_path, team_rating_data):
     """
-    This function
-    :param dataframe:
-    :param input_data_path:
-    :param team_rating_data:
-    :return:
+    This function fills in the null home team ranking data points using the team's most recent ranking
+    :param dataframe: full player dataset
+    :param input_data_path: file path to the input datasets
+    :param team_rating_data: file name of the past premier league table data
+    :return: dataframe containing complete team_rating field (no null values)
     """
     # Read in the ratings data
     team_ratings = pd.read_csv(os.path.join(input_data_path, team_rating_data))
