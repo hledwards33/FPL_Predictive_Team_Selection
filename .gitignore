@@ -1,2 +1,8 @@
 # .gitignore
 __pycache__
+
+# Do not add ipynb_checkpoints
+.ipynb_checkpoints
+
+# Do not add venv
+.FPLStatModel_venv
