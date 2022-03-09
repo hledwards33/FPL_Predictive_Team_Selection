@@ -126,6 +126,9 @@ def assign_latest_team(dataframe, date_field, player_field, team_field):
     # Merge player_team dataset with main dataframe
     dataframe = pd.merge(dataframe, player_team, how='left', on=['name'])
 
+    # Divide the value column by 10 so that the units are more intuitive and in the same format as the game
+    dataframe['value'] = dataframe['value'] / 10
+
     # Return the modified dataframe
     return dataframe
 
