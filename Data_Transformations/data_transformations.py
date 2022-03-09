@@ -94,7 +94,10 @@ def data_transformations(dataframe, date_field, player_field, team_field, input_
     dataframe = fill_null_team_rating(dataframe, input_data_path, team_rating_data)
 
     # Rewrite True/False was_home field to 1/0 field
-    dataframe['was_home'] = dataframe['was_home'].apply(lambda x: 1 if x==True else 0)
+    dataframe['was_home'] = dataframe['was_home'].apply(lambda x: 1 if x == True else 0)
+
+    # Drop element field from the dataframe because this is just the unique player
+    dataframe.drop('element', axis=1, inplace=True)
 
     # Return the transformed dataset
     return dataframe
