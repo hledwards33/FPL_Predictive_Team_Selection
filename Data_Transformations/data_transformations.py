@@ -93,6 +93,9 @@ def data_transformations(dataframe, date_field, player_field, team_field, input_
     # Some home teams do not have team ranking due to us using most recent team in dataset
     dataframe = fill_null_team_rating(dataframe, input_data_path, team_rating_data)
 
+    # Rewrite True/False was_home field to 1/0 field
+    dataframe['was_home'] = dataframe['was_home'].apply(lambda x: 1 if x==True else 0)
+
     # Return the transformed dataset
     return dataframe
 
